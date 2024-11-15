@@ -1,8 +1,10 @@
 from Bio import SeqIO
+from ipdb import set_trace
+
 
 # Load all.fasta into a dictionary mapping IDs to records (including headers)
 all_sequences = {}
-with open('../dataset/interpro_structured_disordered.fasta', 'r') as all_file:
+with open('../../dataset/interpro_structured_disordered.fasta', 'r') as all_file:
     for record in SeqIO.parse(all_file, 'fasta'):
         # Extract ID up to the first '|' character
         id_all = record.id.split('|')[0]
@@ -10,24 +12,28 @@ with open('../dataset/interpro_structured_disordered.fasta', 'r') as all_file:
 
 # Load target.fasta into a list of tuples (ID, sequence, header)
 target_sequences = []
-file = 'L3_after_i2_cdhit.fasta'
+file = 'L2_type_iteration_5_after_cluster.fasta'
 type = file.split('_')[0]
-with open('../dataset/'+file, 'r') as target_file:
+with open('../../dataset/'+file, 'r') as target_file:
     for record in SeqIO.parse(target_file, 'fasta'):
         # Extract ID up to the first '_' character
         id_target = record.id.split('_')[0]
+        
         # Keep the original header from target.fasta
         header_target = record.description
         # Convert the sequence to uppercase
         seq_target = str(record.seq).upper()
         target_sequences.append((id_target, seq_target, header_target))
 
+
+# set_trace()
 # For each target sequence, find the corresponding sequence in all.fasta
 # and extract the sequence to the right of the target sequence
 results = []
 for id_target, seq_target, header_target in target_sequences:
     if id_target in all_sequences:
         record_all = all_sequences[id_target]
+        # set_trace()
         seq_all = str(record_all.seq).upper()
         # Find where seq_target occurs in seq_all
         index = seq_all.find(seq_target)
@@ -50,7 +56,7 @@ for id_target, seq_target, header_target in target_sequences:
         results.append((header, ''))
 
 # Write the results to a new FASTA file, keeping the original target headers
-with open(f'{type}_after_i2_cdhit_IDR.fasta', 'w') as output_file:
+with open(f'{type}_after_i5_cdhit_IDR.fasta', 'w') as output_file:
     for header, seq_result in results:
         output_file.write(f">{header}\n")  # Use the header from target.fasta
         output_file.write(f"{seq_result}\n")
