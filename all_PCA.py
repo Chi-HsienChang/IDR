@@ -105,7 +105,7 @@ plt.subplots_adjust(right=0.75)  # Adjust to make room for legend
 # os.makedirs('./result/', exist_ok=True)
 
 # Save the plot to a file
-plot_filename = "./more_pca_dipeptide_proportions_L2_L3_structure.png"
+plot_filename = "./pca_dipeptide_proportions_L2_L3_structure_IDR_1118.png"
 plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
-plt.show()
+# plt.show()
 print(f"PCA plot saved to {plot_filename}")

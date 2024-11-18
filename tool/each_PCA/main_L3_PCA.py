@@ -39,10 +39,10 @@ dipeptide_list = [aa1 + aa2 for aa1 in amino_acids for aa2 in amino_acids]
 data_list = []
 
 # file_list = ['L2_after_i2_cdhit_structured.fasta', 'L2_after_i2_cdhit_disordered.fasta']
-file_list = ['L3_after_i2_cdhit_structured.fasta', 'L3_after_i2_cdhit_disordered.fasta']
+file_list = ['L3_after_i5_cdhit_structure.fasta', 'L3_after_i5_cdhit_IDR.fasta']
 
 for filename in tqdm(file_list, desc="Processing each file"):
-    dataset = './dataset/' + filename
+    dataset = '../../dataset/' + filename
     Level = filename.split('_')[0]
     Structure = filename.split('_')[4].split('.')[0]
     clade_sequences = {}
@@ -93,116 +93,116 @@ df_pivot = df_melted.pivot(index='Dipeptide', columns='Clade_ID', values='Propor
 df_pivot.reset_index(inplace=True)
 
 # Save the DataFrame to a CSV file
-csv_filename = "./result/L3_dipeptide_proportions.csv"
+csv_filename = "./L3_dipeptide_proportions.csv"
 df_pivot.to_csv(csv_filename, index=False)
 print(f"Dipeptide proportion data saved to {csv_filename}")
 
 ##########
 
-import pandas as pd
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import numpy as np
+# import pandas as pd
+# from sklearn.decomposition import PCA
+# import matplotlib.pyplot as plt
+# import numpy as np
 
-# Load the dipeptide proportion data
-csv_filename = "./result/L3_dipeptide_proportions.csv"  # Ensure this matches your saved file
-df = pd.read_csv(csv_filename)
+# # Load the dipeptide proportion data
+# csv_filename = "./L3_dipeptide_proportions.csv"  # Ensure this matches your saved file
+# df = pd.read_csv(csv_filename)
 
-# Set 'Dipeptide' as the index
-df.set_index('Dipeptide', inplace=True)
+# # Set 'Dipeptide' as the index
+# df.set_index('Dipeptide', inplace=True)
 
-# Transpose the DataFrame so that clades are rows and dipeptides are columns
-df_transposed = df.transpose()
+# # Transpose the DataFrame so that clades are rows and dipeptides are columns
+# df_transposed = df.transpose()
 
-# Ensure all column names are strings
-df_transposed.columns = df_transposed.columns.astype(str)
+# # Ensure all column names are strings
+# df_transposed.columns = df_transposed.columns.astype(str)
 
-# Split the 'Clade_ID' to extract 'Level', 'Structure', and 'Clade'
-df_transposed.reset_index(inplace=True)
-df_transposed.rename(columns={'index': 'Clade_ID'}, inplace=True)
-df_transposed[['Level', 'Structure', 'Clade']] = df_transposed['Clade_ID'].str.split('_', expand=True)
+# # Split the 'Clade_ID' to extract 'Level', 'Structure', and 'Clade'
+# df_transposed.reset_index(inplace=True)
+# df_transposed.rename(columns={'index': 'Clade_ID'}, inplace=True)
+# df_transposed[['Level', 'Structure', 'Clade']] = df_transposed['Clade_ID'].str.split('_', expand=True)
 
-# Reorder columns to move 'Level', 'Structure', 'Clade' to the front
-cols = ['Clade_ID', 'Level', 'Structure', 'Clade'] + [col for col in df_transposed.columns if col not in ['Clade_ID', 'Level', 'Structure', 'Clade']]
-df_transposed = df_transposed[cols]
+# # Reorder columns to move 'Level', 'Structure', 'Clade' to the front
+# cols = ['Clade_ID', 'Level', 'Structure', 'Clade'] + [col for col in df_transposed.columns if col not in ['Clade_ID', 'Level', 'Structure', 'Clade']]
+# df_transposed = df_transposed[cols]
 
-# Convert data to numeric, coerce errors to NaN
-feature_cols = df_transposed.columns[4:]  # Exclude 'Clade_ID', 'Level', 'Structure', 'Clade'
-df_transposed[feature_cols] = df_transposed[feature_cols].apply(pd.to_numeric, errors='coerce')
+# # Convert data to numeric, coerce errors to NaN
+# feature_cols = df_transposed.columns[4:]  # Exclude 'Clade_ID', 'Level', 'Structure', 'Clade'
+# df_transposed[feature_cols] = df_transposed[feature_cols].apply(pd.to_numeric, errors='coerce')
 
-# Handle missing values (e.g., fill with zeros or drop columns/rows with NaNs)
-df_transposed.fillna(0, inplace=True)  # You can choose an appropriate method
+# # Handle missing values (e.g., fill with zeros or drop columns/rows with NaNs)
+# df_transposed.fillna(0, inplace=True)  # You can choose an appropriate method
 
-# Perform PCA
-pca = PCA(n_components=2)
-principal_components = pca.fit_transform(df_transposed[feature_cols])
+# # Perform PCA
+# pca = PCA(n_components=2)
+# principal_components = pca.fit_transform(df_transposed[feature_cols])
 
-# Create a DataFrame with the principal components and metadata
-pc_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
-pc_df = pd.concat([pc_df, df_transposed[['Clade_ID', 'Level', 'Structure', 'Clade']]], axis=1)
+# # Create a DataFrame with the principal components and metadata
+# pc_df = pd.DataFrame(data=principal_components, columns=['PC1', 'PC2'])
+# pc_df = pd.concat([pc_df, df_transposed[['Clade_ID', 'Level', 'Structure', 'Clade']]], axis=1)
 
-# Assign markers to 'Clade' types, with 'Fungi' using '^'
-clades = pc_df['Clade'].unique()
+# # Assign markers to 'Clade' types, with 'Fungi' using '^'
+# clades = pc_df['Clade'].unique()
 
-# Assign the marker '^' to 'Fungi', and other markers to other clades
-clade_marker_dict = {}
-clade_marker_dict['Fungi'] = 'P' 
-clade_marker_dict['Metazoa'] = '*' 
-clade_marker_dict['Streptophyta'] = 'h'
+# # Assign the marker '^' to 'Fungi', and other markers to other clades
+# clade_marker_dict = {}
+# clade_marker_dict['Fungi'] = 'P' 
+# clade_marker_dict['Metazoa'] = '*' 
+# clade_marker_dict['Streptophyta'] = 'h'
 
 
-# List of markers excluding '^', as it's assigned to 'Fungi'
-markers = ['o', 's', 'D', 'v','H','X']
-marker_index = 0
+# # List of markers excluding '^', as it's assigned to 'Fungi'
+# markers = ['o', 's', 'D', 'v','H','X']
+# marker_index = 0
 
-for clade in clades:
-    if clade != 'Fungi' and clade != 'Metazoa' and clade != 'Streptophyta':
-        clade_marker_dict[clade] = markers[marker_index % len(markers)]
-        marker_index += 1
+# for clade in clades:
+#     if clade != 'Fungi' and clade != 'Metazoa' and clade != 'Streptophyta':
+#         clade_marker_dict[clade] = markers[marker_index % len(markers)]
+#         marker_index += 1
 
-# Assign colors to 'Structure' types
-structure_types = pc_df['Structure'].unique()
-structure_colors = {'structured': 'blue', 'disordered': 'red'}  # Adjust colors if needed
+# # Assign colors to 'Structure' types
+# structure_types = pc_df['Structure'].unique()
+# structure_colors = {'structured': 'blue', 'disordered': 'red'}  # Adjust colors if needed
 
-# Plot the PCA results
-plt.figure(figsize=(10, 8))
+# # Plot the PCA results
+# plt.figure(figsize=(10, 8))
 
-for idx, row in pc_df.iterrows():
-    structure = row['Structure']
-    clade = row['Clade']
-    x = row['PC1']
-    y = row['PC2']
-    color = structure_colors.get(structure, 'gray')
-    marker = clade_marker_dict.get(clade, 'o')
-    plt.scatter(x, y, color=color, marker=marker, s=100)
+# for idx, row in pc_df.iterrows():
+#     structure = row['Structure']
+#     clade = row['Clade']
+#     x = row['PC1']
+#     y = row['PC2']
+#     color = structure_colors.get(structure, 'gray')
+#     marker = clade_marker_dict.get(clade, 'o')
+#     plt.scatter(x, y, color=color, marker=marker, s=100)
 
-# Create custom legend entries
-import matplotlib.lines as mlines
+# # Create custom legend entries
+# import matplotlib.lines as mlines
 
-# Legend entries for 'Structure' types (colors)
-structure_entries = [mlines.Line2D([], [], color=color, marker='o', linestyle='None', markersize=10, label=structure) for structure, color in structure_colors.items()]
+# # Legend entries for 'Structure' types (colors)
+# structure_entries = [mlines.Line2D([], [], color=color, marker='o', linestyle='None', markersize=10, label=structure) for structure, color in structure_colors.items()]
 
-# Legend entries for 'Clade' types (markers)
-clade_entries = []
-for clade in clades:
-    marker = clade_marker_dict.get(clade, 'o')
-    clade_entries.append(mlines.Line2D([], [], color='black', marker=marker, linestyle='None', markersize=10, label=clade))
+# # Legend entries for 'Clade' types (markers)
+# clade_entries = []
+# for clade in clades:
+#     marker = clade_marker_dict.get(clade, 'o')
+#     clade_entries.append(mlines.Line2D([], [], color='black', marker=marker, linestyle='None', markersize=10, label=clade))
 
-# Combine legend entries
-legend_entries = structure_entries + clade_entries
+# # Combine legend entries
+# legend_entries = structure_entries + clade_entries
 
-# Add legend to the right-hand side
-plt.legend(handles=legend_entries, loc='center left', bbox_to_anchor=(1, 0.5), title='Legend')
+# # Add legend to the right-hand side
+# plt.legend(handles=legend_entries, loc='center left', bbox_to_anchor=(1, 0.5), title='Legend')
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.title('L3: PCA of Dipeptide Proportions by Structure and Clade (Fungi uses "^")')
-plt.grid(True)
-plt.tight_layout()
-plt.subplots_adjust(right=0.75)  # Adjust subplot to make room for the legend
+# plt.xlabel('Principal Component 1')
+# plt.ylabel('Principal Component 2')
+# plt.title('L3: PCA of Dipeptide Proportions by Structure and Clade (Fungi uses "^")')
+# plt.grid(True)
+# plt.tight_layout()
+# plt.subplots_adjust(right=0.75)  # Adjust subplot to make room for the legend
 
-# Save the plot to a file
-plot_filename = "./result/L3_pca_dipeptide_proportions.png"
-plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
-plt.show()
-print(f"PCA plot saved to {plot_filename}")
+# # Save the plot to a file
+# plot_filename = "./result/L3_pca_dipeptide_proportions.png"
+# plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
+# plt.show()
+# print(f"PCA plot saved to {plot_filename}")

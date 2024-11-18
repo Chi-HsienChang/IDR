@@ -12,7 +12,7 @@ with open('../../dataset/interpro_structured_disordered.fasta', 'r') as all_file
 
 # Load target.fasta into a list of tuples (ID, sequence, header)
 target_sequences = []
-file = 'L2_type_iteration_5_after_cluster.fasta'
+file = 'L3_type_iteration_5_after_cluster.fasta'
 type = file.split('_')[0]
 with open('../../dataset/'+file, 'r') as target_file:
     for record in SeqIO.parse(target_file, 'fasta'):
